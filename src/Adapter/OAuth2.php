@@ -298,7 +298,7 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
         try {
             $this->authenticateCheckError();
 
-            $code = filter_input($_SERVER['REQUEST_METHOD'] === 'POST' ? INPUT_POST : INPUT_GET, 'code');
+            $code = filter_var(isset(($data = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET)['code']) ? $data['code'] : '');
 
             if (empty($code)) {
                 $this->authenticateBegin();
@@ -325,11 +325,11 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
     */
     protected function authenticateCheckError()
     {
-        $error = filter_input(INPUT_GET, 'error', FILTER_SANITIZE_SPECIAL_CHARS);
+        $error = filter_var(isset($_GET['error']) ? $_GET['error'] : '',FILTER_SANITIZE_SPECIAL_CHARS);
 
         if (! empty($error)) {
-            $error_description = filter_input(INPUT_GET, 'error_description', FILTER_SANITIZE_SPECIAL_CHARS);
-            $error_uri = filter_input(INPUT_GET, 'error_uri', FILTER_SANITIZE_SPECIAL_CHARS);
+            $error_description = filter_var(isset($_GET['error_description']) ? $_GET['error_description'] : '',FILTER_SANITIZE_SPECIAL_CHARS);
+            $error_uri = filter_var(isset($_GET['error_uri']) ? $_GET['error_uri'] : '',FILTER_SANITIZE_SPECIAL_CHARS);
 
             throw new InvalidAuthorizationCodeException(
                 sprintf('Provider returned an error: %s %s %s', $error, $error_description, $error_uri)
@@ -367,8 +367,8 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
             [HttpClient\Util::getCurrentUrl(true)]
         );
 
-        $state = filter_input($_SERVER['REQUEST_METHOD'] === 'POST' ? INPUT_POST : INPUT_GET, 'state');
-        $code = filter_input($_SERVER['REQUEST_METHOD'] === 'POST' ? INPUT_POST : INPUT_GET, 'code');
+        $state = filter_var(isset(($data = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET)['state']) ? $data['state'] : '');
+        $code = filter_var(isset(($data = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET)['code']) ? $data['code'] : '');
 
         /**
         * Authorization Request State
